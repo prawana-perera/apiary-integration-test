@@ -1,0 +1,171 @@
+swagger: "2.0"
+info:
+  version: "2.0.0"
+  title: Essentials Public API - Journal Transactions Draft
+#host: localhost
+host: 70dc65bd.ngrok.io
+basePath: /
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /businesses/{businessId}/journaltransactions:
+    x-swagger-router-controller: JournalTransactions
+    get:
+      operationId: getJournalTransactions
+      description: Returns a collection of JournalTransactions for the business
+      parameters:
+        - name: businessId
+          in: path
+          description: The business id
+          required: true
+          type: string
+          x-example: 1
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/JournalTransactionResponse"
+definitions:
+  JournalTransactionResponse:
+    type: object
+    required:
+      - data
+      - links
+    properties:
+      data:
+        type: array
+        items:
+          $ref: "#/definitions/JournalTransaction"
+      links:
+        type: object
+        required:
+          - self
+        properties:
+          self:
+            description: A URI which generated this response
+            type: string
+          first:
+            description: A link to the first page of results
+            type: string
+          last:
+            description: A link to the last page of results
+            type: string
+          next:
+            description: A link to the next page of results
+            type: string
+          prev:
+            description: A link to the previous page of results
+            type: string
+  JournalTransaction:
+    type: object
+    required:
+      - id
+      - type
+      - attributes
+      - links
+    properties:
+      id:
+        type: string
+      type:
+        type: string
+        enum:
+          - journaltransactions
+      attributes:
+        type: object
+        required:
+          - transactionDate
+          - type
+          - entries
+        properties:
+          description:
+            type: string
+          reference:
+            type: string
+          transactionDate:
+            type: string
+            format: date-time
+          type:
+            type: string
+            enum:
+              - INVOICE
+              - PAYROLL
+              - CUSTOMER_PAYMENT
+              - CUSTOMER_RETURN
+              - BILL
+              - SUPPLIER_PAYMENT
+              - TBC
+          entries:
+            type: array
+            minItems: 2
+            items:
+              $ref: "#/definitions/JournalEntry"
+      links:
+        type: object
+        required:
+          - self
+        properties:
+          self:
+            description: A link to access details additional details about the JournalTransaction
+            type: string
+  JournalEntry:
+    type: object
+    required:
+      - account
+      - type
+      - typeShortName
+    properties:
+      account:
+        type: object
+        description: The account which money was debited or credited
+        required:
+          - id
+          - name
+          - number
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+          number:
+            type: string
+      credit:
+        description: The amount credited to the account
+        type: number
+        minimum: 0
+      debit:
+        description: the amount debited to the acoount
+        type: number
+        minimum: 0
+      creditInclusiveAmount:
+        description: TBA
+        type: number
+        minimum: 0
+      debitInclusiveAmount:
+        description: TBA
+        type: number
+        minimum: 0
+      taxAmount:  
+        description: TBA
+        type: number
+        minimum: 0
+      description:
+        type: string
+      type:
+        type: string
+        enum:
+          - PAYMENT
+          - JOURNAL
+          - SUPPLIER_RETURN
+          - TAX
+          - INVOICE
+          - TBC.
+      typeShortName:
+        description: TBA
+        type: string
+      gstType:
+        description: TBA
+        type: string
